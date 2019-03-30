@@ -1,0 +1,63 @@
+{% include 'nav.html' %}
+<div class="main">
+<!-- GOOGLE PLUS SIGN IN BUTTON-->
+           <div id="signinButton" style="padding: 5px;margin-top:10px;text-align: center;">
+              <span class="g-signin2"
+                data-scope="profile openid email"
+                data-client_id="859758356263-spq7ftnep1ibb3f60a9umlm2mkiufhc3.apps.googleusercontent.com"
+                data-redirecturi="postmessage"
+                data-accesstype="offline"
+                data-cookiepolicy="single_host_origin"
+                data-callback="signInCallback"
+                data-approvalprompt="force">
+              </span>
+            </div>             
+<!--END GOOGLE PLUS SIGN IN BUTTON -->
+
+<center><div id="result">
+  <div class="container">
+  <div class="row"> 
+    {% for tb in tbs %}
+    
+      <div class="col-sm-3" style="border:1px solid blue;
+            border-radius: 20px;padding: 30px; width: 350px; margin: 20px;">
+          <a href="{{ url_for('showEditions',tbid=tb.id)}}" style="text-decoration: none;"><h4 class="text-primary">{{tb.name}}</h4></a>
+          
+      </div>
+      
+    {% endfor %}
+  </div>  
+</div>
+</div></center>
+
+<script>
+  $('#signinButton').click(function() {
+    function signInCallback(authResult){
+      if (authResult['code']){
+        $('#signinButton').attr('style', 'display: none');
+        $.ajax({
+          type: 'POST',
+          url: '/gconnect?state={{STATE}}',
+          headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+          },
+          contentType: 'application/octet-stream; charset=utf-8',
+          success:function(result){
+            $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
+                 setTimeout(function() {
+                  window.location.href = "/BookStore";
+                 }, 2000);
+          },
+          processData:false,
+          data:authResult['code']
+        });
+      } else{
+        // handle error
+        console.log('There was an error: ' + authResult['error']);
+        $('#result').html('Failed to make a server-side call. Check your configuration and console.');
+      }
+    }
+    auth2.grantOfflineAccess().then(signInCallback);
+  });
+</script>
+</div>
